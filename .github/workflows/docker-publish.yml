@@ -8,7 +8,7 @@ on:
       - master 
 
 jobs:
-  ci:
+  publish:
     permissions:
       contents: read
       packages: write
