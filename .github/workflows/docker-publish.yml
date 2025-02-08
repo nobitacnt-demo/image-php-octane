@@ -4,11 +4,9 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - master 
 
 jobs:
-  ci:
+  publish:
     permissions:
       contents: read
       packages: write
