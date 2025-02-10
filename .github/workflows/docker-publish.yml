@@ -4,9 +4,26 @@ on:
   push:
     tags:
       - 'v*'
-
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch (Mx-123, latest, v1.2.3)'
+        required: true
 jobs:
-  publish:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - id: branch
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "branch=${{ github.event.inputs.branch }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "branch=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+    outputs:
+      branch: ${{ steps.branch.outputs.branch }}
+  ci:
+    needs: prepare
     permissions:
       contents: read
       packages: write
@@ -14,7 +31,7 @@ jobs:
     with:
       registry: ghcr.io
       repository: ghcr.io/${{ github.repository }}
-      branch: ${{ github.ref_name }}
+      branch: ${{ needs.prepare.outputs.branch }}
     secrets:
       docker-username: ${{ github.actor }}
       docker-password: ${{ secrets.GITHUB_TOKEN }}
